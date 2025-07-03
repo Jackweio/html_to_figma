@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康助手 - 专业问诊</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        accent: '#FF9F43',
+                        neutral: '#F3F4F6',
+                        'neutral-dark': '#4B5563',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 15px rgba(0, 0, 0, 0.05)',
+                        'card-hover': '0 10px 25px rgba(22, 93, 255, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .transition-custom {
+                transition: all 0.3s ease;
+            }
+            .scale-hover {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .scale-hover:hover {
+                transform: translateY(-5px) scale(1.01);
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #165DFF 0%, #3B82F6 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .card-shadow {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen">
+    <!-- 导航栏 -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="text-primary text-2xl">
+                    <i class="fa fa-heartbeat"></i>
+                </div>
+                <span class="text-xl font-bold text-gray-800">康伴AI</span>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="./首页.html" class="text-gray-600 hover:text-primary transition-colors duration-200">
+                    <i class="fa fa-home mr-1"></i> 首页
+                </a>
+                <a href="./监测.html" class="text-gray-600 hover:text-primary transition-colors duration-200">
+                    <i class="fa fa-running mr-1"></i> 动作纠错
+                </a>
+                <a href="./计划表.html" class="text-gray-600 hover:text-primary transition-colors duration-200">
+                    <i class="fa fa-stethoscope mr-1"></i> AI诊断
+                </a>
+                <a href="consultation.html" class="text-primary font-medium">
+                    <i class="fa fa-user-md mr-1"></i> 专业问诊
+                </a>
+            </nav>
+            
+            <div class="md:hidden">
+                <button id="menu-toggle" class="text-gray-700 focus:outline-none">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden bg-white py-4 px-4 shadow-lg md:hidden">
+            <a href="./首页.html"style="text-decoration: none;" class="block py-2 text-gray-600 hover:text-primary transition-colors duration-200">
+                <i class="fa fa-home mr-1"></i> 首页
+            </a>
+            <a href="./计划表.html" style="text-decoration: none;"class="block py-2 text-gray-600 hover:text-primary transition-colors duration-200">
+                <i class="fa fa-running mr-1"></i> 动作纠错
+            </a>
+            <a href="./监测.html" style="text-decoration: none;"class="block py-2 text-gray-600 hover:text-primary transition-colors duration-200">
+                <i class="fa fa-stethoscope mr-1"></i> AI诊断
+            </a>
+            <a href="./专业诊断.html" style="text-decoration: none;"class="block py-2 text-primary font-medium">
+                <i class="fa fa-user-md mr-1"></i> 专业问诊
+            </a>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="container mx-auto px-4 pt-24 pb-20">
+        <section class="mb-12">
+            <div class="text-center mb-10">
+                <h1 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-gray-800 mb-3 text-shadow">
+                    <i class="fa fa-user-md text-primary mr-2"></i>专业医生问诊
+                </h1>
+                <p class="text-gray-600 max-w-3xl mx-auto text-lg">
+                    连接三甲医院权威专家，提供一对一在线问诊服务，专业可靠，即时响应
+                </p>
+            </div>
+            
+            <!-- 筛选条件 -->
+            <div class="bg-white rounded-xl shadow-card p-4 mb-8">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">科室筛选</label>
+                        <div class="relative">
+                            <select class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                                <option value="">全部科室</option>
+                                <option value="内科">内科</option>
+                                <option value="外科">外科</option>
+                                <option value="儿科">儿科</option>
+                                <option value="妇产科">妇产科</option>
+                                <option value="皮肤科">皮肤科</option>
+                                <option value="神经内科">神经内科</option>
+                                <option value="精神心理科">精神心理科</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <i class="fa fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">专长领域</label>
+                        <div class="relative">
+                            <select class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                                <option value="">全部专长</option>
+                                <option value="慢性病管理">慢性病管理</option>
+                                <option value="心理咨询">心理咨询</option>
+                                <option value="术后康复">术后康复</option>
+                                <option value="运动损伤">运动损伤</option>
+                                <option value="孕期指导">孕期指导</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <i class="fa fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">可预约时间</label>
+                        <div class="relative">
+                            <select class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                                <option value="">不限时间</option>
+                                <option value="今天">今天</option>
+                                <option value="明天">明天</option>
+                                <option value="周末">周末</option>
+                                <option value="工作日">工作日</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <i class="fa fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-end">
+                        <button class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg transition-custom flex items-center">
+                            <i class="fa fa-search mr-2"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 医生列表 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 医生卡片 1 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card scale-hover">
+                    <div class="p-6">
+                        <div class="flex items-start">
+                            <img src="https://picsum.photos/seed/doctor1/100/100" alt="张医生照片" class="w-20 h-20 rounded-full object-cover border-4 border-primary/10">
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">张明医生</h3>
+                                        <p class="text-primary font-medium">心内科 | 主任医师</p>
+                                    </div>
+                                    <div class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        可立即咨询
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-half-o"></i>
+                                    </div>
+                                    <span class="ml-1 text-gray-600 text-sm">4.8 (245评价)</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm line-clamp-2">
+                                    擅长冠心病、高血压、心力衰竭等心血管疾病的诊断与治疗，拥有20年临床经验。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex justify-between text-sm">
+                                <div class="text-gray-600">
+                                    <i class="fa fa-hospital-o mr-1"></i> 北京协和医院
+                                </div>
+                                <div class="text-gray-600">
+                                    <i class="fa fa-clock-o mr-1"></i> 已接诊2347次
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex space-x-3">
+                                <button class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-comments-o mr-2"></i> 立即咨询
+                                </button>
+                                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-calendar-plus-o mr-2"></i> 预约
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 医生卡片 2 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card scale-hover">
+                    <div class="p-6">
+                        <div class="flex items-start">
+                            <img src="https://picsum.photos/seed/doctor2/100/100" alt="李医生照片" class="w-20 h-20 rounded-full object-cover border-4 border-primary/10">
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">李华医生</h3>
+                                        <p class="text-primary font-medium">骨科 | 副主任医师</p>
+                                    </div>
+                                    <div class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        今日可约
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-o"></i>
+                                    </div>
+                                    <span class="ml-1 text-gray-600 text-sm">4.2 (187评价)</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm line-clamp-2">
+                                    专注于脊柱外科、关节置换、运动医学等领域，尤其擅长颈椎病、腰椎间盘突出的微创治疗。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex justify-between text-sm">
+                                <div class="text-gray-600">
+                                    <i class="fa fa-hospital-o mr-1"></i> 上海瑞金医院
+                                </div>
+                                <div class="text-gray-600">
+                                    <i class="fa fa-clock-o mr-1"></i> 已接诊1892次
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex space-x-3">
+                                <button class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-comments-o mr-2"></i> 立即咨询
+                                </button>
+                                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-calendar-plus-o mr-2"></i> 预约
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 医生卡片 3 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card scale-hover">
+                    <div class="p-6">
+                        <div class="flex items-start">
+                            <img src="https://picsum.photos/seed/doctor3/100/100" alt="王医生照片" class="w-20 h-20 rounded-full object-cover border-4 border-primary/10">
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">王丽医生</h3>
+                                        <p class="text-primary font-medium">妇产科 | 主任医师</p>
+                                    </div>
+                                    <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        周末可约
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                    </div>
+                                    <span class="ml-1 text-gray-600 text-sm">4.9 (312评价)</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm line-clamp-2">
+                                    在孕期保健、高危妊娠管理、妇科肿瘤等方面经验丰富，曾发表学术论文30余篇。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex justify-between text-sm">
+                                <div class="text-gray-600">
+                                    <i class="fa fa-hospital-o mr-1"></i> 广州中山医院
+                                </div>
+                                <div class="text-gray-600">
+                                    <i class="fa fa-clock-o mr-1"></i> 已接诊3215次
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex space-x-3">
+                                <button class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-comments-o mr-2"></i> 立即咨询
+                                </button>
+                                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-calendar-plus-o mr-2"></i> 预约
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 医生卡片 4 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card scale-hover">
+                    <div class="p-6">
+                        <div class="flex items-start">
+                            <img src="https://picsum.photos/seed/doctor4/100/100" alt="赵医生照片" class="w-20 h-20 rounded-full object-cover border-4 border-primary/10">
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">赵明医生</h3>
+                                        <p class="text-primary font-medium">神经内科 | 副主任医师</p>
+                                    </div>
+                                    <div class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        可立即咨询
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-half-o"></i>
+                                    </div>
+                                    <span class="ml-1 text-gray-600 text-sm">4.7 (203评价)</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm line-clamp-2">
+                                    专注于脑血管病、帕金森病、癫痫等神经系统疾病的诊断与治疗，拥有丰富的临床经验。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex justify-between text-sm">
+                                <div class="text-gray-600">
+                                    <i class="fa fa-hospital-o mr-1"></i> 成都华西医院
+                                </div>
+                                <div class="text-gray-600">
+                                    <i class="fa fa-clock-o mr-1"></i> 已接诊1764次
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex space-x-3">
+                                <button class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-comments-o mr-2"></i> 立即咨询
+                                </button>
+                                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-calendar-plus-o mr-2"></i> 预约
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 医生卡片 5 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card scale-hover">
+                    <div class="p-6">
+                        <div class="flex items-start">
+                            <img src="https://picsum.photos/seed/doctor5/100/100" alt="陈医生照片" class="w-20 h-20 rounded-full object-cover border-4 border-primary/10">
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">陈琳医生</h3>
+                                        <p class="text-primary font-medium">儿科 | 主任医师</p>
+                                    </div>
+                                    <div class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        今日可约
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-o"></i>
+                                    </div>
+                                    <span class="ml-1 text-gray-600 text-sm">4.3 (287评价)</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm line-clamp-2">
+                                    擅长儿童常见病、多发病的诊治，对儿童哮喘、过敏性疾病等有深入研究。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex justify-between text-sm">
+                                <div class="text-gray-600">
+                                    <i class="fa fa-hospital-o mr-1"></i> 武汉同济医院
+                                </div>
+                                <div class="text-gray-600">
+                                    <i class="fa fa-clock-o mr-1"></i> 已接诊2653次
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex space-x-3">
+                                <button class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-comments-o mr-2"></i> 立即咨询
+                                </button>
+                                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-calendar-plus-o mr-2"></i> 预约
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 医生卡片 6 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card scale-hover">
+                    <div class="p-6">
+                        <div class="flex items-start">
+                            <img src="https://picsum.photos/seed/doctor6/100/100" alt="林医生照片" class="w-20 h-20 rounded-full object-cover border-4 border-primary/10">
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">林芳医生</h3>
+                                        <p class="text-primary font-medium">精神心理科 | 副主任医师</p>
+                                    </div>
+                                    <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        周末可约
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                    </div>
+                                    <span class="ml-1 text-gray-600 text-sm">4.9 (342评价)</span>
+                                </div>
+                                <p class="mt-2 text-gray-600 text-sm line-clamp-2">
+                                    专注于抑郁症、焦虑症、睡眠障碍等心理问题的诊断与治疗，提供专业心理咨询服务。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex justify-between text-sm">
+                                <div class="text-gray-600">
+                                    <i class="fa fa-hospital-o mr-1"></i> 南京脑科医院
+                                </div>
+                                <div class="text-gray-600">
+                                    <i class="fa fa-clock-o mr-1"></i> 已接诊2987次
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex space-x-3">
+                                <button class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-comments-o mr-2"></i> 立即咨询
+                                </button>
+                                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-custom flex items-center justify-center">
+                                    <i class="fa fa-calendar-plus-o mr-2"></i> 预约
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 分页 -->
+            <div class="mt-12 flex justify-center">
+                <nav class="flex items-center space-x-1">
+                    <a href="#" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+                        <i class="fa fa-chevron-left text-xs"></i>
+                    </a>
+                    <a href="#" class="px-4 py-2 rounded-lg bg-primary text-white">1</a>
+                    <a href="#" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">2</a>
+                    <a href="#" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">3</a>
+                    <span class="px-2 text-gray-400">...</span>
+                    <a href="#" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">8</a>
+                    <a href="#" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+                        <i class="fa fa-chevron-right text-xs"></i>
+                    </a>
+                </nav>
+            </div>
+        </section>
+        
+        <!-- 问诊流程 -->
+        <section class="bg-white rounded-xl shadow-card p-8 mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-8 text-center">专业问诊流程</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-search text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">选择医生</h3>
+                    <p class="text-gray-600">
+                        根据科室、专长和评价，选择适合您的专业医生
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-calendar-check-o text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">预约时间</h3>
+                    <p class="text-gray-600">
+                        选择方便的咨询时间，确认预约并支付费用
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-comments text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">在线咨询</h3>
+                    <p class="text-gray-600">
+                        通过图文、语音或视频与医生进行一对一咨询
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-file-text-o text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">获取建议</h3>
+                    <p class="text-gray-600">
+                        获得专业诊断意见和治疗建议，随时查看历史记录
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 用户评价 -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-8 text-center">用户真实评价</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 评价卡片 1 -->
+                <div class="bg-white rounded-xl shadow-card p-6 scale-hover">
+                    <div class="flex text-yellow-400 mb-3">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 mb-4 italic">
+                        "张医生非常专业，对我的问题解答得很详细，让我对自己的病情有了更清晰的认识。平台操作也很简单，咨询体验很好。"
+                    </p>
+                    <div class="flex items-center">
+                        <img src="https://picsum.photos/seed/user1/50/50" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
+                        <div class="ml-3">
+                            <h4 class="font-medium text-gray-800">李女士</h4>
+                            <p class="text-sm text-gray-500">2025年6月15日</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 评价卡片 2 -->
+                <div class="bg-white rounded-xl shadow-card p-6 scale-hover">
+                    <div class="flex text-yellow-400 mb-3">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star-half-o"></i>
+                    </div>
+                    <p class="text-gray-600 mb-4 italic">
+                        "林医生很有耐心，针对我孩子的情况给出了很多实用的建议，解答了我很多疑惑。预约也很方便，不用排队，省时省力。"
+                    </p>
+                    <div class="flex items-center">
+                        <img src="https://picsum.photos/seed/user2/50/50" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
+                        <div class="ml-3">
+                            <h4 class="font-medium text-gray-800">王先生</h4>
+                            <p class="text-sm text-gray-500">2025年6月22日</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 评价卡片 3 -->
+                <div class="bg-white rounded-xl shadow-card p-6 scale-hover">
+                    <div class="flex text-yellow-400 mb-3">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 mb-4 italic">
+                        "第一次使用在线问诊，体验超出预期。赵医生专业水平高，诊断准确，给了我很多针对性的建议，非常感谢！"
+                    </p>
+                    <div class="flex items-center">
+                        <img src="https://picsum.photos/seed/user3/50/50" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
+                        <div class="ml-3">
+                            <h4 class="font-medium text-gray-800">陈女士</h4>
+                            <p class="text-sm text-gray-500">2025年6月30日</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="text-white text-2xl">
+                            <i class="fa fa-heartbeat"></i>
+                        </div>
+                        <span class="text-xl font-bold">健康助手</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        专业的在线健康咨询平台，连接优质医疗资源，为您的健康保驾护航。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-youtube-play"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="action.html" class="text-gray-400 hover:text-white transition-colors">动作纠错</a></li>
+                        <li><a href="diagnosis.html" class="text-gray-400 hover:text-white transition-colors">AI诊断</a></li>
+                        <li><a href="consultation.html" class="text-gray-400 hover:text-white transition-colors">专业问诊</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">健康资讯</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fa fa-map-marker mt-1 mr-3 text-gray-400"></i>
+                            <span class="text-gray-400">北京市海淀区中关村大街1号</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-phone mt-1 mr-3 text-gray-400"></i>
+                            <span class="text-gray-400">400-123-4567</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-envelope mt-1 mr-3 text-gray-400"></i>
+                            <span class="text-gray-400">contact@healthassistant.com</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">订阅健康资讯</h3>
+                    <p class="text-gray-400 mb-4">
+                        订阅我们的健康资讯，获取最新的健康知识和专家建议。
+                    </p>
+                    <form class="flex">
+                        <input type="email" placeholder="您的邮箱地址" class="px-4 py-2 rounded-l-lg w-full focus:outline-none text-gray-800">
+                        <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-r-lg transition-custom">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                    &copy; 2025 健康助手. 保留所有权利.
+                </p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">隐私政策</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">服务条款</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">关于我们</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2');
+                navbar.classList.add('shadow-lg');
+            } else {
+                navbar.classList.remove('py-2');
+                navbar.classList.remove('shadow-lg');
+            }
+        });
+        
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+    

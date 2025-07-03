@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康助手 - AI智能诊断</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --primary-light: #6d8dc5;
+            --secondary: #ff7e5f;
+            --light: #f8f9fc;
+            --dark: #2c3e50;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --gray: #e0e6ed;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .page-content {
+            padding: 40px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+
+        .page-title i {
+            font-size: 36px;
+        }
+
+        .page-title span {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .diagnosis-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .diagnosis-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .diagnosis-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card-header i {
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            background: rgba(74, 111, 165, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .card-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group label i {
+            color: var(--primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--gray);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: #f8f9fc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(74, 111, 165, 0.3);
+        }
+
+        .symptoms-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .symptom-tag {
+            background: rgba(74, 111, 165, 0.1);
+            color: var(--primary);
+            padding: 8px 15px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .symptom-tag:hover {
+            background: rgba(74, 111, 165, 0.2);
+        }
+
+        .symptom-tag.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .nav-button {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-button:nth-child(1) {
+            background: linear-gradient(90deg, #ff7e5f 0%, #feb47b 100%);
+            color: white;
+        }
+
+        .nav-button:nth-child(2) {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .nav-button:nth-child(3) {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .ai-analysis {
+            background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+            display: none;
+        }
+
+        .analysis-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .analysis-header i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .analysis-header h2 {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .analysis-result {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            line-height: 1.8;
+            border-left: 4px solid var(--primary);
+        }
+
+        .analysis-result h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .recommendations {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .recommendation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            border-top: 3px solid var(--primary);
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .rec-icon {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .rec-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .rec-content {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gray), transparent);
+            margin: 40px 0;
+        }
+
+        @media (max-width: 992px) {
+            .diagnosis-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .recommendations {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-content {
+                padding: 30px 20px;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .checkbox-group, .symptoms-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .recommendations {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="logo-text">康伴AI</div>
+            </div>
+            <button class="back-button">
+                <a href="./首页.html"style="text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> 返回主页
+                </a>
+            </button>
+        </div>
+        
+        <div class="page-content">
+            <h1 class="page-title">
+                <i class="fas fa-stethoscope"></i>
+                <span>AI智能诊断</span>
+            </h1>
+            
+            <div class="diagnosis-container">
+                <div class="diagnosis-card">
+                    <div class="card-header">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h2>症状描述</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="symptoms"><i class="fas fa-comment-medical"></i> 请详细描述您的症状</label>
+                        <textarea class="form-control" id="symptoms" placeholder="例如：头痛、发烧、咳嗽...请尽可能详细描述症状特点、部位和持续时间"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-check"></i> 症状持续时间</label>
+                        <select class="form-control">
+                            <option>少于1天</option>
+                            <option>1-3天</option>
+                            <option>4-7天</option>
+                            <option>1-2周</option>
+                            <option>2-4周</option>
+                            <option>1个月以上</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-thermometer-half"></i> 严重程度</label>
+                        <select class="form-control">
+                            <option>轻微（不影响日常生活）</option>
+                            <option>中度（影响部分活动）</option>
+                            <option>严重（影响大部分活动）</option>
+                            <option>非常严重（无法正常活动）</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="diagnosis-card">
+                    <div class="card-header">
+                        <i class="fas fa-plus-circle"></i>
+                        <h2>伴随症状</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-head-side-cough"></i> 常见症状</label>
+                        <div class="symptoms-list">
+                            <div class="symptom-tag">脖子</div>
+                            <div class="symptom-tag">腰</div>
+                            <div class="symptom-tag">腿</div>
+                            <div class="symptom-tag">背部</div>
+                            <div class="symptom-tag">乏力</div>
+                            <div class="symptom-tag">肌肉劳损</div>
+                            <div class="symptom-tag">关节疼痛</div>
+                            <div class="symptom-tag">手臂</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-lungs"></i> 上半身</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cough">
+                                <label for="cough">手部</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="shortness">
+                                <label for="shortness">头部</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="chest-pain">
+                                <label for="chest-pain">背部</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="sore-throat">
+                                <label for="sore-throat">颈部</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-heartbeat"></i> 下半身</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="palpitations">
+                                <label for="palpitations">脚痛</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="swelling">
+                                <label for="swelling">腿麻</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="dizziness">
+                                <label for="dizziness">胯部</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="submit-btn">
+                        <i class="fas fa-diagnoses"></i> 开始AI诊断
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="ai-analysis">
+                <div class="analysis-header">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <h2>AI诊断结果</h2>
+                </div>
+                
+                <div class="analysis-result">
+                    <h3>初步诊断：上呼吸道感染（普通感冒）</h3>
+                    <p>根据您描述的症状（头痛、咳嗽、喉咙痛、轻度发烧），AI分析认为您可能患有普通感冒。这是一种常见的病毒感染，通常持续7-10天。您的症状严重程度为中度，持续时间约3天，符合感冒的典型发展过程。</p>
+                    <p>建议注意休息，多饮水，保持室内空气流通。如症状持续加重或出现高烧（超过38.5℃）、呼吸困难等症状，请及时就医。</p>
+                </div>
+                
+                <div class="recommendations">
+                    <div class="recommendation-card">
+                        <div class="rec-icon">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="rec-title">休息建议</div>
+                        <div class="rec-content">保证每天7-8小时睡眠，避免过度劳累，有助于免疫系统恢复。</div>
+                    </div>
+                    
+                    <div class="recommendation-card">
+                        <div class="rec-icon">
+                            <i class="fas fa-apple-alt"></i>
+                        </div>
+                        <div class="rec-title">饮食建议</div>
+                        <div class="rec-content">多摄入富含维生素C的水果蔬菜，如柑橘、猕猴桃、西兰花等，避免辛辣刺激食物。</div>
+                    </div>
+                    
+                    <div class="recommendation-card">
+                        <div class="rec-icon">
+                            <i class="fas fa-capsules"></i>
+                        </div>
+                        <div class="rec-title">药物建议</div>
+                        <div class="rec-content">可考虑服用非处方感冒药缓解症状，如对乙酰氨基酚缓解头痛发烧，止咳药水缓解咳嗽。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav-buttons">
+        <button class="nav-button" onclick="location.href='action.html'">
+            <a href="./监测.html"style="text-decoration: none;" >
+            <i class="fas fa-running"></i> 动作纠错
+        </button>
+        <button class="nav-button" onclick="showPage('diagnosis-page')">
+            <a href="./计划表.html"style="text-decoration: none;">
+            <i class="fas fa-stethoscope"></i> AI诊断
+        </button>
+        <button class="nav-button" onclick="location.href='consultation.html'">
+            <a href="./专业诊断.html"style="text-decoration: none;">
+            <i class="fas fa-user-md"></i> 专业问诊
+        </button>
+    </div>
+
+    <script>
+        // 症状标签选择效果
+        document.querySelectorAll('.symptom-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+        
+        // 提交按钮效果
+        document.querySelector('.submit-btn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 分析中...';
+            
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-diagnoses"></i> 开始AI诊断';
+                document.querySelector('.ai-analysis').style.display = 'block';
+                
+                // 滚动到结果区域
+                document.querySelector('.ai-analysis').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            }, 2000);
+        });
+        
+        // 按钮点击效果
+        document.querySelectorAll('.btn, .submit-btn, .back-button, .nav-button').forEach(btn => {
+            btn.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(2px)';
+            });
+            
+            btn.addEventListener('mouseup', function() {
+                this.style.transform = '';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康助手 - 动作纠正</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
+        }
+        
+        :root {
+            --primary: #0078d7;
+            --secondary: #00b7c3;
+            --action: #ff6b6b;
+            --success: #42e695;
+            --warning: #ffcc00;
+            --light-bg: #f8fdff;
+            --card-bg: #ffffff;
+            --text-dark: #333;
+            --text-light: #777;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --border-radius: 16px;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f9ff, #e6f7ff);
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        
+        /* 头部导航 */
+        .header {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            font-size: 28px;
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        
+        /* 页面布局 */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* 动作分析网格 */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .action-card {
+            height: 100%;
+            border-top: 4px solid var(--action);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .action-card.good {
+            border-top-color: var(--success);
+        }
+        
+        .action-card.warning {
+            border-top-color: var(--warning);
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .action-visual {
+            height: 200px;
+            background: linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.05));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .action-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--action);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .action-badge.good {
+            background: var(--success);
+        }
+        
+        .action-badge.warning {
+            background: var(--warning);
+        }
+        
+        .action-model {
+            width: 160px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .model-figure {
+            width: 100px;
+            height: 100px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .model-head {
+            width: 40px;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            position: absolute;
+            top: -15px;
+        }
+        
+        .model-body {
+            width: 30px;
+            height: 50px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            position: absolute;
+            top: 25px;
+        }
+        
+        .model-arm {
+            width: 10px;
+            height: 40px;
+            background: #f0f0f0;
+            position: absolute;
+            border-radius: 5px;
+        }
+        
+        .model-leg {
+            width: 15px;
+            height: 50px;
+            background: #f0f0f0;
+            position: absolute;
+            border-radius: 5px;
+            bottom: -30px;
+        }
+        
+        .action-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .action-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        .action-desc {
+            font-size: 15px;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            line-height: 1.6;
+            flex: 1;
+        }
+        
+        .action-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-light);
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        /* 纠正指导部分 */
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .step {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: #f9f9f9;
+            transition: var(--transition);
+        }
+        
+        .step:hover {
+            background: #f0f9ff;
+            transform: translateX(5px);
+        }
+        
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .step-desc {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        /* 进度追踪 */
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .progress-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+        
+        .progress-text {
+            flex: 1;
+        }
+        
+        .progress-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .progress-status {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .progress-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+        
+        .nav-btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            color: white;
+        }
+        
+        .nav-btn.active {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-btn.action {
+            background: var(--action);
+        }
+        
+        .nav-btn.diagnosis {
+            background: #4facfe;
+        }
+        
+        .nav-btn.consultation {
+            background: var(--success);
+        }
+        
+        .nav-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-3px);
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bottom-nav {
+                width: 95%;
+                justify-content: center;
+            }
+            
+            .nav-btn span {
+                display: none;
+            }
+            
+            .nav-btn {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="logo-text">康伴AI</div>
+        </div>
+        <a href="./首页.html" style="text-decoration: none;">
+        <button class="back-button" onclick="window.location.href='index.html'">
+            
+            <i class="fas fa-arrow-left"></i> 返回主页
+        </button>
+        </a>
+    </div>
+    
+    <!-- 主内容区域 -->
+    <div class="container">
+        <div class="main-content">
+            <!-- 动作分析网格 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-running"></i>
+                        <span>动作分析与纠正</span>
+                    </h2>
+                    <div class="filter">
+                        <select id="filter-select">
+                            <option>所有动作</option>
+                            <option>需纠正</option>
+                            <option>良好</option>
+                            <option>需改进</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="action-grid">
+                        <div class="action-card">
+                            <div class="action-visual">
+                                <div class="action-model">
+                                    <div class="model-figure">
+                                        <div class="model-head"></div>
+                                        <div class="model-body"></div>
+                                        <div class="model-arm" style="left: 10px; transform: rotate(-45deg);"></div>
+                                        <div class="model-arm" style="right: 10px; transform: rotate(45deg);"></div>
+                                        <div class="model-leg" style="left: 15px; transform: rotate(-10deg);"></div>
+                                        <div class="model-leg" style="right: 15px; transform: rotate(10deg);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-content">
+                                <h3 class="action-title">深蹲姿势分析</h3>
+                                <p class="action-desc">检测到您的膝盖内扣超过脚尖，背部弯曲角度过大，容易导致膝盖和腰部损伤。</p>
+                                <div class="action-stats">
+                                    <div><i class="fas fa-exclamation-triangle"></i> 风险: <span class="stat-value">高</span></div>
+                                    <div><i class="fas fa-bullseye"></i> 准确率: <span class="stat-value">92%</span></div>
+                                </div>
+                            </div>
+                            <div class="action-badge">需纠正</div>
+                        </div>
+                        
+                        <div class="action-card good">
+                            <div class="action-visual">
+                                <div class="action-model">
+                                    <div class="model-figure">
+                                        <div class="model-head"></div>
+                                        <div class="model-body"></div>
+                                        <div class="model-arm" style="left: 10px; transform: rotate(-15deg);"></div>
+                                        <div class="model-arm" style="right: 10px; transform: rotate(15deg);"></div>
+                                        <div class="model-leg" style="left: 15px; transform: rotate(-5deg);"></div>
+                                        <div class="model-leg" style="right: 15px; transform: rotate(5deg);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-content">
+                                <h3 class="action-title">俯卧撑姿势分析</h3>
+                                <p class="action-desc">您的身体保持直线，肘部角度适中，核心收紧，是非常标准的俯卧撑姿势。</p>
+                                <div class="action-stats">
+                                    <div><i class="fas fa-exclamation-triangle"></i> 风险: <span class="stat-value">低</span></div>
+                                    <div><i class="fas fa-bullseye"></i> 准确率: <span class="stat-value">95%</span></div>
+                                </div>
+                            </div>
+                            <div class="action-badge good">良好</div>
+                        </div>
+                        
+                        <div class="action-card warning">
+                            <div class="action-visual">
+                                <div class="action-model">
+                                    <div class="model-figure">
+                                        <div class="model-head"></div>
+                                        <div class="model-body"></div>
+                                        <div class="model-arm" style="left: 5px; transform: rotate(-80deg);"></div>
+                                        <div class="model-arm" style="right: 5px; transform: rotate(80deg);"></div>
+                                        <div class="model-leg" style="left: 10px; transform: rotate(-20deg);"></div>
+                                        <div class="model-leg" style="right: 10px; transform: rotate(20deg);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-content">
+                                <h3 class="action-title">跑步姿势分析</h3>
+                                <p class="action-desc">检测到您的步幅过大，着地点在身体前方过远，可能导致膝关节冲击过大。</p>
+                                <div class="action-stats">
+                                    <div><i class="fas fa-exclamation-triangle"></i> 风险: <span class="stat-value">中</span></div>
+                                    <div><i class="fas fa-bullseye"></i> 准确率: <span class="stat-value">89%</span></div>
+                                </div>
+                            </div>
+                            <div class="action-badge warning">需改进</div>
+                        </div>
+                        
+                        <div class="action-card">
+                            <div class="action-visual">
+                                <div class="action-model">
+                                    <div class="model-figure">
+                                        <div class="model-head"></div>
+                                        <div class="model-body" style="transform: rotate(20deg);"></div>
+                                        <div class="model-arm" style="left: 0px; transform: rotate(-60deg);"></div>
+                                        <div class="model-arm" style="right: 0px; transform: rotate(60deg);"></div>
+                                        <div class="model-leg" style="left: 15px; transform: rotate(-30deg);"></div>
+                                        <div class="model-leg" style="right: 15px; transform: rotate(30deg);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-content">
+                                <h3 class="action-title">硬拉姿势分析</h3>
+                                <p class="action-desc">检测到背部弯曲过度，臀部抬起过早，重心前移，容易造成腰部损伤。</p>
+                                <div class="action-stats">
+                                    <div><i class="fas fa-exclamation-triangle"></i> 风险: <span class="stat-value">高</span></div>
+                                    <div><i class="fas fa-bullseye"></i> 准确率: <span class="stat-value">91%</span></div>
+                                </div>
+                            </div>
+                            <div class="action-badge">需纠正</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 纠正指导 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>深蹲动作纠正指导</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="steps-container">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">脚部位置调整</div>
+                                <div class="step-desc">双脚与肩同宽，脚尖稍微向外（约15-30度），重心均匀分布在脚掌</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">下蹲动作控制</div>
+                                <div class="step-desc">屈髋向后坐，保持背部挺直，下蹲至大腿与地面平行，膝盖不超过脚尖</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-title">核心收紧</div>
+                                <div class="step-desc">全程保持核心肌群收紧，维持脊柱中立位，避免腰部弯曲</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-title">上升动作</div>
+                                <div class="step-desc">脚跟发力推动身体上升，保持膝盖与脚尖方向一致，避免内扣</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <!-- 进度追踪 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        <span>动作进步追踪</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="progress-container">
+                        <div class="progress-item">
+                            <div class="progress-info">
+                                <div class="progress-icon">
+                                    <i class="fas fa-running"></i>
+                                </div>
+                                <div class="progress-text">
+                                    <div class="progress-title">深蹲姿势</div>
+                                    <div class="progress-status">最近7天</div>
+                                </div>
+                            </div>
+                            <div class="progress-value">+28%</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-info">
+                                <div class="progress-icon">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <div class="progress-text">
+                                    <div class="progress-title">跑步姿势</div>
+                                    <div class="progress-status">最近7天</div>
+                                </div>
+                            </div>
+                            <div class="progress-value">+15%</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-info">
+                                <div class="progress-icon">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div class="progress-text">
+                                    <div class="progress-title">硬拉姿势</div>
+                                    <div class="progress-status">最近7天</div>
+                                </div>
+                            </div>
+                            <div class="progress-value">+22%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="progress-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 训练计划 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>推荐训练计划</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="steps-container">
+                        <div class="step">
+                            <div class="step-number">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="step-content">
+                                <div class="step-title">周一：深蹲训练</div>
+                                <div class="step-desc">3组×12次 标准深蹲练习</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <div class="step-content">
+                                <div class="step-title">周三：硬拉训练</div>
+                                <div class="step-desc">3组×10次 轻重量硬拉</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="step-content">
+                                <div class="step-title">周五：综合训练</div>
+                                <div class="step-desc">深蹲+硬拉组合训练</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <button class="nav-btn action active">
+            <a href="./监测.html"style="text-decoration: none;">
+            <i class="fas fa-running"></i>
+            <span>动作纠正</span>
+        </button>
+        <button class="nav-btn diagnosis">
+            <a href="./计划表.html"style="text-decoration: none;">
+            <i class="fas fa-stethoscope"></i>
+            <span>AI诊断</span>
+        </button>
+        <button class="nav-btn consultation">
+            <a href="./专业诊断.html"style="text-decoration: none;">
+            <i class="fas fa-user-md"></i>
+            <span>专业问诊</span>
+        </button>
+    </div>
+
+    <script>
+        // 初始化图表
+        const ctx = document.getElementById('progress-chart').getContext('2d');
+        const progressChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: '动作准确率',
+                    data: [45, 52, 60, 68, 75, 82],
+                    borderColor: '#0078d7',
+                    backgroundColor: 'rgba(0, 120, 215, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 底部导航按钮交互
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // 卡片悬停效果
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.12)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'var(--shadow)';
+            });
+        });
+        
+        // 步骤悬停效果
+        document.querySelectorAll('.step').forEach(step => {
+            step.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            step.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body>
+</html>
